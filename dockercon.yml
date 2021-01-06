@@ -1,0 +1,42 @@
+- hosts: all
+  tasks:
+  - name: configuration of yum repository
+    yum_repository:
+            name: "docker"
+            baseurl: "https://download.docker.com/linux/centos/7/x86_64/stable/"
+            description: "mydocker"
+            gpgcheck: no
+
+  - name: command to install docker
+    command: "yum install docker-ce  --nobest -y"
+
+  - name: start docker service
+    service:
+            name: docker
+            state: started
+
+  - name: install softwere python36
+    package:
+            name: python36
+            state: present
+
+  - name: install docker python module
+    pip:
+            name: docker-py
+
+  - name: download the docker images
+    docker_image:
+            name: httpd
+            pull: yes
+
+  - name: launch daucker cotainer
+    docker_container:
+            name: myhttpdos
+            image: httpd
+            detach: yes
+            interactive: yes
+            state: started
+            ports:
+                    - "1134:80"
+            volumes:
+                    - /root/data/:/usr/local/apache2/htdocs/
